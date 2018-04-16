@@ -6,7 +6,7 @@ import sys, inspect
 from os.path import dirname, join, abspath
 from urllib import parse
 
-# os.environ['S3_KEY']
+# os.environ['S3_KEY'] using heroku's environ
 SECRETFILE = 'secrets.json'
 SECRETFILE = join(dirname(abspath(inspect.stack()[0][1])), SECRETFILE)
 
