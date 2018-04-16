@@ -1,0 +1,7 @@
+# Binaries and libraries
+.Python
+bin/
+include/
+lib/
+
+pip-selfcheck.json
