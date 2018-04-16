@@ -7,6 +7,8 @@ name = "pypi"
 pyotp = "*"
 requests = "*"
 flask = "*"
+"psycopg2-binary" = "*"
+flask-wtf = "*"
 
 [dev-packages]
 
