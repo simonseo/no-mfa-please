@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*- 
 # @File Name: flaskapp.py
 # @Created:   2018-04-17 00:09:27  Simon Myunggun Seo (simon.seo@nyu.edu) 
-# @Updated:   2018-04-17 02:08:16  Simon Seo (simon.seo@nyu.edu)
+# @Updated:   2018-04-17 02:16:42  Simon Seo (simon.seo@nyu.edu)
 from flask import Flask, request, render_template, redirect, url_for
 
 # Built-in
@@ -45,7 +45,7 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
-@app.route('/generate-passocde', methods=['GET', 'POST'])
+@app.route('/generate-passcode', methods=['GET', 'POST'])
 def generate_passcode():
     form = PasscodeRequestForm(request.form)
     if request.method == 'POST' and form.validate():
