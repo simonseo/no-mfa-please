@@ -1,2 +1,2 @@
 web: echo "hello world"
-web: python flaskapp.py
+web: python run.py
