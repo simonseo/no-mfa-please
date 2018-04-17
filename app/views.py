@@ -1,9 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*- 
-# @File Name: flaskapp.py
+# @File Name: views.py
 # @Created:   2018-04-17 00:09:27  Simon Myunggun Seo (simon.seo@nyu.edu) 
-# @Updated:   2018-04-17 02:16:42  Simon Seo (simon.seo@nyu.edu)
-from flask import Flask, request, render_template, redirect, url_for
+# @Updated:   2018-04-17 02:51:31  Simon Seo (simon.seo@nyu.edu)
+from flask import request, render_template, redirect, url_for
 
 # Built-in
 import os
@@ -14,10 +14,6 @@ import psycopg2
 # My own
 from form import RegistrationForm, PasscodeRequestForm
 
-
-app = Flask(__name__)
-DATABASE_URL = os.environ['DATABASE_URL']
-conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 
 @app.route("/")#, methods=['GET','POST'])
 def main():
@@ -55,9 +51,6 @@ def generate_passcode():
         flash('We\'ll send you an email with your new passcode!')
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
-
-if __name__ == "__main__":
-	app.run(host="0.0.0.0", port=int(os.environ["PORT"]))
 
 	
 
