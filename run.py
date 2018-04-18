@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*- 
 # @File Name: run.py
 # @Created:   2018-04-17 02:22:09  Simon Myunggun Seo (simon.seo@nyu.edu) 
-# @Updated:   2018-04-17 13:44:40  Simon Seo (simon.seo@nyu.edu)
+# @Updated:   2018-04-17 14:29:48  Simon Seo (simon.seo@nyu.edu)
 import os
 from app import app
 
