@@ -9,7 +9,6 @@ requests = "*"
 flask = "*"
 "psycopg2-binary" = "*"
 flask-wtf = "*"
-"psycopg2" = "*"
 
 [dev-packages]
 
