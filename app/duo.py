@@ -7,8 +7,6 @@ from os.path import dirname, join, abspath
 from urllib import parse
 
 # os.environ['S3_KEY'] using heroku's environ
-SECRETFILE = 'secrets.json'
-SECRETFILE = join(dirname(abspath(inspect.stack()[0][1])), SECRETFILE)
 
 
 def qr_url_to_activation_url(qr_url):
@@ -36,7 +34,7 @@ def activate_device(activation_url):
 	return hotp_secret
 
 def save_secret(hotp_secret, count):
-	'''Save to secrets.json
+	'''Save updated info to DB
 	hotp_secret should look like "7e1c0372fec015ac976765ef4bb5c3f3" 
 	count should be an int'''
 	secrets = {
@@ -47,6 +45,7 @@ def save_secret(hotp_secret, count):
 		json.dump(secrets, f)
 
 def load_secret():
+	'''loads datarow from DB'''
 	try:
 		with open(SECRETFILE, "r") as f:
 			secret_dict = json.load(f)
@@ -71,24 +70,3 @@ def HOTP():
 		save_secret(hotp_secret, HOTP.count)
 		return passcode
 	return generate
-
-def main(qr_url):
-	activation_url = qr_url_to_activation_url(qr_url)
-	hotp_secret = activate_device(activation_url)
-	save_secret(hotp_secret, count=0)
-
-	# Generate 10 OTPs!
-	# You may use any OTP but all previous OTPs will become invalid
-	print("HOTP Secret:", base64.b32encode(hotp_secret.encode("utf-8")))
-
-	print("First 10 One Time Passwords:")
-	generateOTP = HOTP()
-	for i in range(10):
-		print(generateOTP())
-
-if __name__ == '__main__':
-	if len(sys.argv) < 2:
-		print("Usage: python3 duo.py <url-to-duo-qr>")
-		exit()
-	qr_url = sys.argv[1]
-	main(qr_url)

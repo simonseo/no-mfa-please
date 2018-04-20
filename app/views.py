@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*- 
 # @File Name: views.py
 # @Created:   2018-04-17 00:09:27  Simon Myunggun Seo (simon.seo@nyu.edu) 
-# @Updated:   2018-04-17 13:37:05  Simon Seo (simon.seo@nyu.edu)
-from flask import request, render_template, redirect, url_for
+# @Updated:   2018-04-20 15:09:26  Simon Seo (simon.seo@nyu.edu)
+from flask import request, render_template, redirect, url_for, flash
 
 # Built-in
 import os
@@ -34,23 +34,20 @@ def handle_data():
 def register():
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
-        user = User(form.username.data, form.email.data,
-                    form.password.data)
-        # db_session.add(user) # SQLAlchemy
-        flash('Thanks for registering')
-        return redirect(url_for('login'))
-    return render_template('register.html', form=form)
+        # db.add(form.username.data, form.email.data, form.password.data)
+        flash('Thanks for registering. Received {} {}'.format(form.email.data, form.password.data))
+        return redirect(url_for('generate_passcode'))
+    return render_template('register.html', title='Register New Account', form=form)
 
-@app.route('/generate-passcode', methods=['GET', 'POST'])
+@app.route('/passcode', methods=['GET', 'POST'])
 def generate_passcode():
     form = PasscodeRequestForm(request.form)
     if request.method == 'POST' and form.validate():
-        user = User(form.username.data, form.email.data,
-                    form.password.data)
+        # db.get(form.email.data, form.password.data)
         # db_session.add(user) # SQLAlchemy
-        flash('We\'ll send you an email with your new passcode!')
-        return redirect(url_for('login'))
-    return render_template('register.html', form=form)
+        flash('We\'ll send an email to {0} with your new passcode! Received {0} {1}'.format(form.email.data, form.password.data))
+        return redirect(url_for('generate_passcode'))
+    return render_template('generate-passcode.html', title='Generate Passcode', form=form)
 
 	
 

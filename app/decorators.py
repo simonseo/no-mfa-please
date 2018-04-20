@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*- 
 # @File Name: decorators.py
 # @Created:   2018-04-17 02:19:49  Simon Myunggun Seo (simon.seo@nyu.edu) 
-# @Updated:   2018-04-17 02:51:40  Simon Seo (simon.seo@nyu.edu)
+# @Updated:   2018-04-20 15:11:24  Simon Seo (simon.seo@nyu.edu)
 
 import os
 from threading import Thread
+from app.sql.create_tables import create_tables
 
 def async(f):
     def wrapper(*args, **kwargs):

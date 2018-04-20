@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*- 
 # @File Name: create_tables.py
 # @Created:   2018-04-17 14:10:08  Simon Myunggun Seo (simon.seo@nyu.edu) 
-# @Updated:   2018-04-17 14:29:41  Simon Seo (simon.seo@nyu.edu)
+# @Updated:   2018-04-20 15:08:23  Simon Seo (simon.seo@nyu.edu)
 
 import psycopg2
-from sql_config import config
+from app.sql.sql_config import config
 
 
 def create_tables():

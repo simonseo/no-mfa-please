@@ -1,7 +1,8 @@
-{% from "_formhelpers.html" import render_field %}
+{% from "_formhelpers.html" import render_field, render_flash %}
+{{ render_flash() }}
 <form method=post>
   <dl>
-    {{ render_field(form.username) }}
+    {{ render_field(form.qr_url) }}
     {{ render_field(form.email) }}
     {{ render_field(form.password) }}
     {{ render_field(form.confirm) }}
