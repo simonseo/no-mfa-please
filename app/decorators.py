@@ -14,4 +14,13 @@ def async(f):
         thr.start()
     return wrapper
 
-    
+def check_db_table_exists(f):
+	def wrapper(*args, **kwargs):
+		# somehow check that db and table exists
+		f(*args, **kwargs)
+	return wrapper
+
+
+
+
+

@@ -14,7 +14,7 @@
 {% macro render_flash() %}
   {% with messages = get_flashed_messages() %}
     {% if messages %}
-      <ul>
+      <ul class="flash_message">
       {% for message in messages %}
           <li>{{ message }} </li>
       {% endfor %}

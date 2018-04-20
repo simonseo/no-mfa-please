@@ -10,13 +10,11 @@
 <body>
 <form method=POST>
   <dl>
-    {{ render_field(form.qr_url) }}
     {{ render_field(form.email) }}
     {{ render_field(form.password) }}
-    {{ render_field(form.confirm) }}
-    {{ render_field(form.accept_tos) }}
+    {{ render_field(form.count) }}
   </dl>
-  <input type=submit value=Register>
+  <input type=submit value="Send me a passcode">
 </form>
 </body>
 </html>
