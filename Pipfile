@@ -9,6 +9,7 @@ requests = "*"
 flask = "*"
 flask-wtf = "*"
 "psycopg2" = "*"
+pytest = "*"
 
 [dev-packages]
 

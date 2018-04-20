@@ -2,26 +2,16 @@
 # -*- coding: utf-8 -*- 
 # @File Name: create_tables.py
 # @Created:   2018-04-17 14:10:08  Simon Myunggun Seo (simon.seo@nyu.edu) 
-# @Updated:   2018-04-20 15:08:23  Simon Seo (simon.seo@nyu.edu)
+# @Updated:   2018-04-21 02:52:09  Simon Seo (simon.seo@nyu.edu)
 
 import psycopg2
-from app.sql.sql_config import config
+from app.db.sql_config import config
 
 
 def create_tables():
 	""" create tables in the PostgreSQL database"""
-	commands = (
-		"""
-			CREATE TABLE accounts (
-			 user_id serial PRIMARY KEY,
-			 -- username VARCHAR (50) UNIQUE NOT NULL,
-			 password VARCHAR (50) NOT NULL,
-			 email VARCHAR (355) UNIQUE NOT NULL,
-			 -- created_on TIMESTAMP NOT NULL,
-			 -- last_login TIMESTAMP
-			 hotp_secret CHAR (32) NOT NULL -- looks like a85adc3516351791c05ef40bde772c24
-			);
-		""",)
+	with open('db_create.sql', 'r') as sqlfile:
+		commands = sqlfile.read().split(';')
 	conn = None
 	try:
 		# read the connection parameters
@@ -31,7 +21,8 @@ def create_tables():
 		cur = conn.cursor()
 		# create table one by one
 		for command in commands:
-			cur.execute(command)
+			if command.strip(): # only execute non-empty ones
+				cur.execute(command)
 		# close communication with the PostgreSQL database server
 		cur.close()
 		# commit the changes

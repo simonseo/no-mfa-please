@@ -9,7 +9,7 @@ from urllib import parse
 # os.environ['S3_KEY'] using heroku's environ
 
 
-def qr_url_to_activation_url(qr_url):
+def _activation_url(qr_url):
 	#--- Create request URL
 	data = parse.unquote(qr_url.split('?value=')[1])           # get ?value=XXX
 	code = data.split('-')[0].replace('duo://', '')            # first half of value is the activation code
@@ -19,7 +19,7 @@ def qr_url_to_activation_url(qr_url):
 	print(activation_url)
 	return activation_url
 
-def activate_device(activation_url):
+def _activate(activation_url):
 	'''Activates through activation url and returns HOTP key '''
 	#--- Get response which will be a JSON of secret keys, customer names, etc.
 	#--- Expected Response: {'response': {'hotp_secret': 'blahblah123', ...}, 'stat': 'OK'}
@@ -32,6 +32,15 @@ def activate_device(activation_url):
 
 	hotp_secret = response_dict['response']['hotp_secret']
 	return hotp_secret
+
+def activate(qr_url):
+	activation_url = _activation_url(qr_url)
+	hotp_secret = _activate(activation_url)
+	return hotp_secret
+
+def encode(hotp_secret):
+	encoded_secret = base64.b32encode(hotp_secret.encode("utf-8"))
+	return encoded_secret
 
 def save_secret(hotp_secret, count):
 	'''Save updated info to DB
@@ -54,19 +63,25 @@ def load_secret():
 	return secret_dict
 
 
-def HOTP():
+def HOTP(hotp_secret, count=0):
 	'''Usage: generate = HOTP(); passcode = generate()'''
 	#--- Create HOTP object
-	secret_dict = load_secret()
-	HOTP.count = secret_dict.get("count", 0)
-	hotp_secret = secret_dict.get("hotp_secret")
-	encoded_secret = base64.b32encode(hotp_secret.encode("utf-8"))
-	hotp = pyotp.HOTP(encoded_secret)   # As long as the secret key is the same, the HOTP object is the same
+	encoded_secret = encode(hotp_secret)
+	HOTP.hotp = pyotp.HOTP(encoded_secret)   # As long as the secret key is the same, the HOTP object is the same
+	HOTP.count = count
 
 	#--- Generate new passcode
-	def generate():
-		passcode = hotp.at(HOTP.count)
-		HOTP.count += 1
-		save_secret(hotp_secret, HOTP.count)
-		return passcode
+	def generate(n=1):
+		passcode_list = []
+		for i in range(n):
+			passcode = HOTP.hotp.at(HOTP.count + i)
+			passcode_list.append(passcode)
+		save_secret(hotp_secret, HOTP.count + n)
+		return passcode_list
 	return generate
+
+
+
+
+
+
