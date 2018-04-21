@@ -1,0 +1,16 @@
+{% from "_formhelpers.html" import render_flash %}
+{{ render_flash() }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{ title }}</title>
+</head>
+<body>
+    <h1>{{ title }}</h1>
+    <a href="{{ urls['register_account'] }}">Sign up</a>
+    <a href="{{ urls['generate_passcode'] }}">Get Passcodes</a>
+</body>
+</html>

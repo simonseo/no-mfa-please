@@ -12,8 +12,8 @@ to make, delete, update, or generate_passcode, require password
 Suggestion: use last_login to prevent spamming
 */
 
-DROP TABLE IF EXISTS accounts;
-CREATE TABLE accounts (
+-- DROP TABLE IF EXISTS accounts;
+CREATE TABLE backup_mfa_accounts (
  user_id SERIAL PRIMARY KEY,
  -- username VARCHAR (50) UNIQUE NOT NULL,
  email VARCHAR (355) UNIQUE NOT NULL,

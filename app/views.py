@@ -16,44 +16,45 @@ import psycopg2
 # My own
 from app import app
 from app.form import RegistrationForm, PasscodeRequestForm
-from app.db.insert_user import insert_user
+from app.db import DB
+from app import duo
 
 logger = logging.getLogger(__name__)
-@app.route("/")#, methods=['GET','POST'])
-def main():
-	return '''
-	<!doctype html>
-	<title>Input new </title>
-	<h1>F*** MFA</h1>
-	'''
-
-@app.route('/handle_data', methods=['POST'])
-def handle_data():
-    projectpath = request.form['projectFilepath']
-    # your code
-    # return a response
-    # 
 
 def encode_password(password):
     return sha256(password.encode('utf-8')).hexdigest()[:32]
+
+@app.route("/")
+def main():
+    urls = {
+        'generate_passcode' : url_for('generate_passcode'),
+        'register_account' : url_for('register_account')
+    }
+    return render_template('index.html', title='F**k MFA', urls=urls)
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_account():
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
+        #also check that account does not exist already
         password = encode_password(form.password.data)
         hotp_secret = 'a85adc3516351791c05ef40bde772c24'
-        # hotp_secret = activate(form.qr_url.data)
+        # hotp_secret = duo.activate(form.qr_url.data)
         # user = User(form.email.data, password, hotp_secret, count=0)
-        insert_user(form.email.data, password, hotp_secret)
-        flash('Thanks for registering. Received {} {}:{}'.format(form.email.data, form.password.data, password))
+        try:
+            DB.insert_user(form.email.data, password, hotp_secret)
+        except Exception as e:
+            flash('I\'m sorry. Try again later. Let the adminstrator know about the error: {}'.format(e))
+        else:
+            flash('Thanks for registering. Received {} {}:{}'.format(form.email.data, form.password.data, password))
         return redirect(url_for('generate_passcode'))
     return render_template('register.html', title='Register New Account', form=form)
 
 @app.route('/passcode', methods=['GET', 'POST'])
 def generate_passcode():
     form = PasscodeRequestForm(request.form)
-    if request.method == 'POST' and form.validate(): 
+    if request.method == 'POST' and form.validate():
         # checking account info should ideally happen in form.validate
         # db.getUser(email)
         # send email
@@ -62,6 +63,8 @@ def generate_passcode():
         return redirect(url_for('generate_passcode'))
     return render_template('generate-passcode.html', title='Generate Passcode', form=form)
 
+
+'''
 @app.route('/delete', methods=['GET', 'POST'])
 def delete_account():
     form = DeleteAccountForm(request.form)
@@ -75,6 +78,6 @@ def edit_account():
     if request.method == 'POST' and form.validate():
         return redirect(url_for("generate_passcode"))
     return render_template('edit.html', title='Update Account Information', form=form)
-
+'''
 
 

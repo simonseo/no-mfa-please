@@ -6,10 +6,15 @@
 
 import psycopg2
 from .sql_config import config
+from app.db import check_tables_exists
+import logging
+logger = logging.getLogger(__name__)
 
+
+@check_tables_exists
 def insert_user(email, password, hotp_secret, counter=0):
     """insert rows into the PostgreSQL database"""
-    sql = """INSERT INTO accounts (email, password, hotp_secret, counter) VALUES (%s, %s, %s, %s);"""
+    sql = """INSERT INTO backup_mfa_accounts (email, password, hotp_secret, counter) VALUES (%s, %s, %s, %s);"""
     conn = None
     try:
         # read database configuration
@@ -25,7 +30,7 @@ def insert_user(email, password, hotp_secret, counter=0):
         cur.close()
         conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
+        logger.error(error)
     finally:
         if conn is not None:
             conn.close()

@@ -11,27 +11,36 @@ from urllib import parse
 
 def _activation_url(qr_url):
 	#--- Create request URL
-	data = parse.unquote(qr_url.split('?value=')[1])           # get ?value=XXX
-	code = data.split('-')[0].replace('duo://', '')            # first half of value is the activation code
-	hostb64 = data.split('-')[1]                               # second half of value is the hostname in base64
-	host = base64.b64decode(hostb64 + '='*(-len(hostb64) % 4)) # Same as "api-e4c9863e.duosecurity.com"
-	activation_url = 'https://{host}/push/v2/activation/{code}'.format(host=host.decode("utf-8"), code=code) # this api is not publicly known
-	print(activation_url)
-	return activation_url
+	try:
+		data = parse.unquote(qr_url.split('?value=')[1])           # get ?value=XXX
+		code = data.split('-')[0].replace('duo://', '')            # first half of value is the activation code
+		hostb64 = data.split('-')[1]                               # second half of value is the hostname in base64
+		host = base64.b64decode(hostb64 + '='*(-len(hostb64) % 4)) # Same as "api-e4c9863e.duosecurity.com"
+		activation_url = 'https://{host}/push/v2/activation/{code}'.format(host=host.decode("utf-8"), code=code) # this api is not publicly known
+		print(activation_url)
+	except IndexError:
+		raise RuntimeError("QR URL is not in proper format.")
+	else:
+		return activation_url
 
 def _activate(activation_url):
 	'''Activates through activation url and returns HOTP key '''
 	#--- Get response which will be a JSON of secret keys, customer names, etc.
 	#--- Expected Response: {'response': {'hotp_secret': 'blahblah123', ...}, 'stat': 'OK'}
 	#--- Expected Error: {'code': 40403, 'message': 'Unknown activation code', 'stat': 'FAIL'}
-	response = requests.post(activation_url)
-	response_dict = json.loads(response.text)
-	if response_dict['stat'] == 'FAIL':
-		raise Exception("The given URL is invalid. Try a new QR/Activation URL")
-	print(response_dict)
+	try:
+		response = requests.post(activation_url)
+		response_dict = json.loads(response.text)
+		print(response_dict)
+		if response_dict['stat'] == 'FAIL':
+			raise Exception("The given URL is invalid. Try a new QR/Activation URL")
+		hotp_secret = response_dict['response']['hotp_secret']
+		return hotp_secret
+	except ConnectionError as e:
+		raise e
+	except KeyError:
+		raise Exception("Response is in unexpected format: {}".format(response.text))
 
-	hotp_secret = response_dict['response']['hotp_secret']
-	return hotp_secret
 
 def activate(qr_url):
 	activation_url = _activation_url(qr_url)
