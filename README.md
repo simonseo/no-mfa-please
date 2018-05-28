@@ -42,7 +42,12 @@ However, this app is still pretty secure because:
 
 ## The Code
 ### Install stuff
-dependencies
+dependencies:
+
+```sh
+$ pipenv install
+```
+
 postgres db
 
 
@@ -55,6 +60,9 @@ $ heroku local
 ### Test
 
 ### Deploy on Heroku
+```sh
+$ git push
+```
 
 ### Try it out
-[Implementation]()
+[Implementation](https://no-mfa-please.herokuapp.com/)

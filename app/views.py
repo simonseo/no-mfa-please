@@ -12,6 +12,7 @@ from hashlib import sha256
 
 # Private Libs
 import psycopg2
+from passlib.apps import custom_app_context as pwd_context
 
 # My own
 from app import app
@@ -26,11 +27,8 @@ def encode_password(password):
 
 @app.route("/")
 def main():
-    urls = {
-        'generate_passcode' : url_for('generate_passcode'),
-        'register_account' : url_for('register_account')
-    }
-    return render_template('index.html', title='F**k MFA', urls=urls)
+    routes = ['generate_passcode', 'register_account']
+    return render_template('index.html', title='F**k MFA', urls={r: url_for(r) for r in routes})
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -38,16 +36,15 @@ def register_account():
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
         #also check that account does not exist already
-        password = encode_password(form.password.data)
-        hotp_secret = 'a85adc3516351791c05ef40bde772c24'
-        # hotp_secret = duo.activate(form.qr_url.data)
-        # user = User(form.email.data, password, hotp_secret, count=0)
+        password = pwd_context.hash(form.password.data)
         try:
+            # hotp_secret = duo.activate(form.qr_url.data)
+            hotp_secret = 'a85adc3516351791c05ef40bde772c24'
             DB.insert_user(form.email.data, password, hotp_secret)
         except Exception as e:
-            flash('I\'m sorry. Try again later. Let the adminstrator know about the error: {}'.format(e))
+            flash("I\'m sorry. Try again later. Let the adminstrator know about the error: {}".format(e))
         else:
-            flash('Thanks for registering. Received {} {}:{}'.format(form.email.data, form.password.data, password))
+            flash("Thanks for registering. Received {} {}:{}".format(form.email.data, form.password.data, password))
         return redirect(url_for('generate_passcode'))
     return render_template('register.html', title='Register New Account', form=form)
 
@@ -56,10 +53,18 @@ def generate_passcode():
     form = PasscodeRequestForm(request.form)
     if request.method == 'POST' and form.validate():
         # checking account info should ideally happen in form.validate
-        # db.getUser(email)
-        # send email
-        logger.debug("form validated")
-        flash('We\'ll send an email to {0} with your new passcode! Received {0} {1} {2}'.format(form.email.data, form.password.data, form.count.data))
+        try:
+            user = DB.get_user(form.email.data)
+            uid, email, password, hotp_secret, counter = user
+            if not pwd_context.verify(form.password.data, password):
+                logger.debug("Password verification failed.")
+                raise Exception("Password does not match the one in the DB.")
+        except Exception as e:
+            logger.debug("Exception in generate_passcode: {}".format(e))
+            flash("We\'re sorry. There is no user with the given credentials. Check your email and password.")
+            return redirect(url_for('generate_passcode'))
+        
+        flash('We\'ll send an email to {0} with your new passcode! Received {0} {1} {2} {3}'.format(form.email.data, form.password.data, form.count.data, hotp_secret))
         return redirect(url_for('generate_passcode'))
     return render_template('generate-passcode.html', title='Generate Passcode', form=form)
 

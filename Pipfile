@@ -11,6 +11,7 @@ flask-wtf = "*"
 "psycopg2" = "*"
 pytest = "*"
 pylint = "*"
+passlib = "*"
 
 [dev-packages]
 

@@ -11,11 +11,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-@check_tables_exists
-def insert_user(email, password, hotp_secret, counter=0):
-    """insert rows into the PostgreSQL database"""
-    sql = """INSERT INTO backup_mfa_accounts (email, password, hotp_secret, counter) VALUES (%s, %s, %s, %s);"""
+# @check_tables_exists
+def get_user(email):
+    """get_user using email"""
     conn = None
+    sql = """SELECT * FROM backup_mfa_accounts WHERE email LIKE %s;"""
     try:
         # read database configuration
         params = config()
@@ -24,17 +24,21 @@ def insert_user(email, password, hotp_secret, counter=0):
         # create a new cursor
         cur = conn.cursor()
         # execute the INSERT statement
-        logger.debug("inserting using query: {}".format(sql % (email, password, hotp_secret, counter)))
-        cur.execute(sql, (email, password, hotp_secret, counter,))
+        logger.debug("Querying: {}".format(sql % email))
+        cur.execute(sql, (email,))
+        rows = cur.fetchall()
+        logger.debug("fetched rows: {}".format(rows))
+        for row in rows:
+            logger.debug("each row: {}".format(row))
+            return row
         # close communication with the database
         cur.close()
         conn.commit()
+        logger.debug("No user was found with provided email")
+        raise Exception("No user was found with provided email")
     except (Exception, psycopg2.DatabaseError) as error:
-        logger.error(error)
+        logger.debug("DB Exception in get_user: {}".format(error))
         raise error
     finally:
         if conn is not None:
             conn.close()
- 
-if __name__ == '__main__':
-	insert_user('simon.seo@nyu.edu', 'asdf', 'a85adc3516351791c05ef40bde772c24')

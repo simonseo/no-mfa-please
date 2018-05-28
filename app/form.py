@@ -24,6 +24,7 @@ class RegistrationForm(Form):
     confirm = PasswordField('Repeat Password', [validators.DataRequired()])
     accept_tos = BooleanField('I accept the Terms of Service', [validators.DataRequired()])
 
+
 class PasscodeRequestForm(Form):
     email = StringField('Email Address', [
             validators.DataRequired(),

@@ -68,7 +68,7 @@ def load_secret():
 		with open(SECRETFILE, "r") as f:
 			secret_dict = json.load(f)
 	except Exception as e:
-		raise
+		raise e
 	return secret_dict
 
 
