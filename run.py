@@ -6,6 +6,6 @@
 import os
 from app import app
 
-# print(os.environ.keys())
+print(os.environ.keys())
 app.secret_key = "Some key"
 app.run(host="0.0.0.0", port=int(os.environ["PORT"]))

@@ -9,8 +9,8 @@ def check_tables_exists(f):
 from app.db.insert_user import insert_user
 from app.db.get_user import get_user
 
-class DB():
-    create_tables = create_tables
-    insert_user = insert_user
-    get_user = get_user
+# class DB():
+#     create_tables = create_tables
+#     insert_user = insert_user
+#     get_user = get_user
 

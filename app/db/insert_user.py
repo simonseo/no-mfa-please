@@ -5,7 +5,7 @@
 # @Updated:   2018-04-21 02:19:43  Simon Seo (simon.seo@nyu.edu)
 
 import psycopg2
-from .sql_config import config
+from .sql_config import get_config
 from app.db import check_tables_exists
 import logging
 logger = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ def insert_user(email, password, hotp_secret, counter=0):
     conn = None
     try:
         # read database configuration
-        params = config()
+        params = get_config()
         # connect to the PostgreSQL database
         conn = psycopg2.connect(**params)
         # create a new cursor

@@ -5,20 +5,20 @@
 # @Updated:   2018-04-21 02:19:43  Simon Seo (simon.seo@nyu.edu)
 
 import psycopg2
-from .sql_config import config
+from .sql_config import get_config
 from app.db import check_tables_exists
 import logging
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
-
-# @check_tables_exists
+@check_tables_exists
 def get_user(email):
     """get_user using email"""
     conn = None
-    sql = """SELECT * FROM backup_mfa_accounts WHERE email LIKE %s;"""
+    sql = """SELECT * FROM backup_mfa_accounts WHERE email LIKE '%s';"""
     try:
         # read database configuration
-        params = config()
+        params = get_config()
         # connect to the PostgreSQL database
         conn = psycopg2.connect(**params)
         # create a new cursor
@@ -35,6 +35,7 @@ def get_user(email):
         cur.close()
         conn.commit()
         logger.debug("No user was found with provided email")
+        return []
         raise Exception("No user was found with provided email")
     except (Exception, psycopg2.DatabaseError) as error:
         logger.debug("DB Exception in get_user: {}".format(error))

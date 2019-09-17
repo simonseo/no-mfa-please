@@ -12,6 +12,7 @@ flask-wtf = "*"
 pytest = "*"
 pylint = "*"
 passlib = "*"
+flask-mail = "*"
 
 [dev-packages]
 

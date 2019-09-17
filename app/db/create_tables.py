@@ -5,7 +5,7 @@
 # @Updated:   2018-04-21 02:52:09  Simon Seo (simon.seo@nyu.edu)
 
 import psycopg2
-from app.db.sql_config import config
+from app.db.sql_config import get_config
 import logging
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ def create_tables():
 	conn = None
 	try:
 		# read the connection parameters
-		params = config()
+		params = get_config()
 		# connect to the PostgreSQL server
 		conn = psycopg2.connect(**params)
 		cur = conn.cursor()

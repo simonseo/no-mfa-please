@@ -8,6 +8,7 @@ from urllib import parse
 
 # os.environ['S3_KEY'] using heroku's environ
 
+# TODO connect duo model to use DB
 
 def _activation_url(qr_url):
 	#--- Create request URL
@@ -85,7 +86,6 @@ def HOTP(hotp_secret, count=0):
 		for i in range(n):
 			passcode = HOTP.hotp.at(HOTP.count + i)
 			passcode_list.append(passcode)
-		save_secret(hotp_secret, HOTP.count + n)
 		return passcode_list
 	return generate
 
