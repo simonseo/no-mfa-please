@@ -8,10 +8,11 @@ import psycopg2
 from .sql_config import get_config
 from app.db import check_tables_exists
 from app import app
+from ..exceptions import UserDataNotFoundException
 
 # @check_tables_exists
 def get_user(email):
-    """get_user using email"""
+    """Retrieve user information that matches the given email"""
     app.logger.debug("User email address: {}".format(email))
     conn = None
     sql = """SELECT * FROM backup_mfa_accounts WHERE email LIKE %s;"""
@@ -22,7 +23,7 @@ def get_user(email):
         conn = psycopg2.connect(**params)
         # create a new cursor
         cur = conn.cursor()
-        # execute the INSERT statement
+        # execute the SELECT statement
         app.logger.debug("Querying: {}".format(sql % email))
         cur.execute(sql, (email,))
         rows = cur.fetchall()
@@ -34,8 +35,7 @@ def get_user(email):
         cur.close()
         conn.commit()
         app.logger.debug("No user was found with provided email")
-        return
-        raise Exception("No user was found with provided email")
+        raise UserDataNotFoundException("No user was found with provided email")
     except (Exception, psycopg2.DatabaseError) as error:
         app.logger.debug("DB Exception in get_user: {}".format(error))
         raise error

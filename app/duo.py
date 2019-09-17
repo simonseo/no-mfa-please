@@ -8,9 +8,7 @@ from urllib import parse
 
 # os.environ['S3_KEY'] using heroku's environ
 
-# TODO connect duo model to use DB
-
-def _activation_url(qr_url):
+def get_activation_url(qr_url):
 	#--- Create request URL
 	try:
 		data = parse.unquote(qr_url.split('?value=')[1])           # get ?value=XXX
@@ -21,6 +19,8 @@ def _activation_url(qr_url):
 		print(activation_url)
 	except IndexError:
 		raise RuntimeError("QR URL is not in proper format.")
+	except Exception as e:
+		raise e
 	else:
 		return activation_url
 
@@ -36,15 +36,17 @@ def _activate(activation_url):
 		if response_dict['stat'] == 'FAIL':
 			raise Exception("The given URL is invalid. Try a new QR/Activation URL")
 		hotp_secret = response_dict['response']['hotp_secret']
-		return hotp_secret
 	except ConnectionError as e:
 		raise e
 	except KeyError:
 		raise Exception("Response is in unexpected format: {}".format(response.text))
-
+	except Exception as e:
+		raise e
+	else:
+		return hotp_secret
 
 def activate(qr_url):
-	activation_url = _activation_url(qr_url)
+	activation_url = get_activation_url(qr_url)
 	hotp_secret = _activate(activation_url)
 	return hotp_secret
 

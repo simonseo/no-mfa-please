@@ -38,8 +38,8 @@ def register_account():
         #also check that account does not exist already
         password = pwd_context.hash(form.password.data)
         try:
-            # hotp_secret = duo.activate(form.qr_url.data)
-            hotp_secret = 'a85adc3516351791c05ef40bde772c24'
+            hotp_secret = duo.activate(form.qr_url.data)
+            # hotp_secret = 'a85adc3516351791c05ef40bde772c24'
             db.insert_user(form.email.data, password, hotp_secret)
         except UniqueViolationException as e:
             flash("An account with that email already exists. Try another one.")
@@ -50,7 +50,8 @@ def register_account():
         else:
             flash("Thanks for registering. Received {} {}:{}".format(form.email.data, form.password.data, password))
             return redirect(url_for('generate_passcode'))
-    return render_template('register.html', title='Register New Account', form=form)
+    else:
+        return render_template('register.html', title='Register New Account', form=form)
 
 @app.route('/passcode', methods=['GET', 'POST'])
 def generate_passcode():
@@ -58,28 +59,37 @@ def generate_passcode():
     if request.method == 'POST' and form.validate():
         # checking account info should ideally happen in form.validate
         try:
+            n=int(form.count.data)
             user = db.get_user(form.email.data)
             if user is not None:
                 uid, email, password, hotp_secret, counter = user
             else:
-                raise UserDataNotFoundException("Password does not match the one in the DB.")
+                raise UserDataNotFoundException("No user data was found with the provided email.")
             if not pwd_context.verify(form.password.data, password):
                 raise WrongPasswordException("Password does not match the one in the DB.")
         except AuthenticationException as e:
             flash("We\'re sorry. There is no user with the given credentials. Check your email and password.")
+            return redirect(url_for('generate_passcode'))
         except Exception as e:
             app.logger.debug("Exception in generate_passcode: {}".format(e))
             flash("I\'m sorry. Try again later. Let the adminstrator know about the error: {}".format(e))
-        else:
-            app.logger.debug("Password verified, hotp_secret:{}".format(hotp_secret))
-            # TODO update user here
-            # TODO get duo to generate hotps
-            hotp_list = duo.generate_hotp(hotp_secret, current_at=0, n=int(form.count.data))
-            flash('We\'ll send an email to {0} with your new passcode! Received {0} {1} {2} {3} {4}'.format(form.email.data, form.password.data, form.count.data, hotp_secret, hotp_list))
+            return redirect(url_for('generate_passcode'))
+        
+        app.logger.debug("Password verified, hotp_secret:{}".format(hotp_secret))
+
+        try:
+            hotp_list = duo.generate_hotp(hotp_secret, current_at=counter, n=n)
+            db.update_user(uid, counter=counter+n)
+        except Exception as e:
+            app.logger.error("Exception while producing new hotp", type(e), e)
+            flash("I\'m sorry. Try again later. Let the adminstrator know about the error: {} {}".format(type(e), e))
+            return redirect(url_for('generate_passcode'))
+
+        flash('We\'ll send an email to {0} with your new passcodes! Received {0} {1} {2} {3} {4}'.format(form.email.data, form.password.data, form.count.data, hotp_secret, hotp_list))
+        flash("New counter: {}".format(counter+n))
         return redirect(url_for('generate_passcode'))
     else:
         return render_template('generate-passcode.html', title='Generate Passcode', form=form)
-
 
 '''
 @app.route('/delete', methods=['GET', 'POST'])

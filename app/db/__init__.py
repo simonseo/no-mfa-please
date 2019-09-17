@@ -8,4 +8,4 @@ def check_tables_exists(f):
 
 from app.db.insert_user import insert_user
 from app.db.get_user import get_user
-
+from app.db.update_user import update_user
