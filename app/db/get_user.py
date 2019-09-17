@@ -7,15 +7,14 @@
 import psycopg2
 from .sql_config import get_config
 from app.db import check_tables_exists
-import logging
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+from app import app
 
-@check_tables_exists
+# @check_tables_exists
 def get_user(email):
     """get_user using email"""
+    app.logger.debug("User email address: {}".format(email))
     conn = None
-    sql = """SELECT * FROM backup_mfa_accounts WHERE email LIKE '%s';"""
+    sql = """SELECT * FROM backup_mfa_accounts WHERE email LIKE %s;"""
     try:
         # read database configuration
         params = get_config()
@@ -24,21 +23,21 @@ def get_user(email):
         # create a new cursor
         cur = conn.cursor()
         # execute the INSERT statement
-        logger.debug("Querying: {}".format(sql % email))
+        app.logger.debug("Querying: {}".format(sql % email))
         cur.execute(sql, (email,))
         rows = cur.fetchall()
-        logger.debug("fetched rows: {}".format(rows))
+        app.logger.debug("fetched rows: {}".format(rows))
         for row in rows:
-            logger.debug("each row: {}".format(row))
+            app.logger.debug("each row: {}".format(row))
             return row
         # close communication with the database
         cur.close()
         conn.commit()
-        logger.debug("No user was found with provided email")
-        return []
+        app.logger.debug("No user was found with provided email")
+        return
         raise Exception("No user was found with provided email")
     except (Exception, psycopg2.DatabaseError) as error:
-        logger.debug("DB Exception in get_user: {}".format(error))
+        app.logger.debug("DB Exception in get_user: {}".format(error))
         raise error
     finally:
         if conn is not None:

@@ -6,13 +6,11 @@
 
 import psycopg2
 from app.db.sql_config import get_config
-import logging
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+from app import app
 
 def create_tables():
 	""" create tables in the PostgreSQL database"""
-	logger.debug("Creating backup_mfa_accounts tables")
+	app.logger.debug("Creating backup_mfa_accounts tables")
 	commands = (
 		"""
 		CREATE TABLE backup_mfa_accounts (
@@ -42,7 +40,7 @@ def create_tables():
 		# commit the changes
 		conn.commit()
 	except (Exception, psycopg2.DatabaseError) as error:
-		logger.error(error)
+		app.logger.error(error)
 	finally:
 		if conn is not None:
 			conn.close()

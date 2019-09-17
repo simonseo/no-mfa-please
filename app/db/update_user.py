@@ -5,11 +5,9 @@
 import psycopg2
 from .sql_config import get_config
 from app.db import check_tables_exists
-import logging
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+from app import app
 
-@check_tables_exists
+# @check_tables_exists
 def update_user(uid, email=None, password=None, hotp_secret=None, counter=None):
     """update the user data"""
     # TODO Create query string
@@ -31,7 +29,7 @@ def update_user(uid, email=None, password=None, hotp_secret=None, counter=None):
         cur.close()
         conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
-        logger.error(error)
+        app.logger.error(error)
     finally:
         if conn is not None:
             conn.close()
