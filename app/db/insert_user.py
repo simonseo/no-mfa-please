@@ -9,7 +9,7 @@ from .sql_config import get_config
 from app.db import check_tables_exists
 import logging
 logger = logging.getLogger(__name__)
-
+logger.setLevel(logging.DEBUG)
 
 @check_tables_exists
 def insert_user(email, password, hotp_secret, counter=0):

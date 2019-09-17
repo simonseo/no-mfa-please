@@ -6,7 +6,7 @@
 import os
 import logging
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 def get_config():
 	on_heroku = 'DYNO' in os.environ

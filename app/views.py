@@ -21,6 +21,7 @@ from app import db
 from app import duo
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 def encode_password(password):
     return sha256(password.encode('utf-8')).hexdigest()[:32]

@@ -8,6 +8,7 @@ import psycopg2
 from app.db.sql_config import get_config
 import logging
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 def create_tables():
 	""" create tables in the PostgreSQL database"""
