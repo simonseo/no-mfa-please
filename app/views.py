@@ -25,11 +25,16 @@ from .exceptions import AuthenticationException, WrongPasswordException, UserDat
 def encode_password(password):
     return sha256(password.encode('utf-8')).hexdigest()[:32]
 
+routes = ['generate_passcode', 'register_account']
+
+
 @app.route("/")
 def main():
-    routes = ['generate_passcode', 'register_account']
     return render_template('index.html', title='F**k MFA', urls={r: url_for(r) for r in routes})
 
+@app.route("/tos")
+def terms_of_service():
+    return render_template('tos.html', title='Terms of Service')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_account():
@@ -48,10 +53,11 @@ def register_account():
             flash("I\'m sorry. Try again later. Let the adminstrator know about the error: {} {}".format(type(e), e))
             return redirect(url_for('register_account'))
         else:
-            flash("Thanks for registering. Received {} {}:{}".format(form.email.data, form.password.data, password))
+            flash("Thanks for registering.")
+            app.logger.debug("Received {} {}:{}".format(form.email.data, form.password.data, password))
             return redirect(url_for('generate_passcode'))
     else:
-        return render_template('register.html', title='Register New Account', form=form)
+        return render_template('register.html', title='Register New Account', form=form, urls={r: url_for(r) for r in routes})
 
 @app.route('/passcode', methods=['GET', 'POST'])
 def generate_passcode():
@@ -85,11 +91,12 @@ def generate_passcode():
             flash("I\'m sorry. Try again later. Let the adminstrator know about the error: {} {}".format(type(e), e))
             return redirect(url_for('generate_passcode'))
 
-        flash('We\'ll send an email to {0} with your new passcodes! Received {0} {1} {2} {3} {4}'.format(form.email.data, form.password.data, form.count.data, hotp_secret, hotp_list))
-        flash("New counter: {}".format(counter+n))
-        return redirect(url_for('generate_passcode'))
+        app.logger.debug('We\'ll send an email to {0} with your new passcodes! Received {0} {1} {2} {3} {4}'.format(form.email.data, form.password.data, form.count.data, hotp_secret, hotp_list))
+        app.logger.debug("New counter: {}".format(counter+n))
+        return render_template('display-passcode.html', title='Retrieved Passcodes', hotp_list=hotp_list, urls={r: url_for(r) for r in routes})
     else:
-        return render_template('generate-passcode.html', title='Generate Passcode', form=form)
+        return render_template('generate-passcode.html', title='Generate Passcode', form=form, urls={r: url_for(r) for r in routes})
+
 
 '''
 @app.route('/delete', methods=['GET', 'POST'])

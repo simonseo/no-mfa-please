@@ -14,6 +14,14 @@
         <a href="{{ urls['register_account'] }}">Sign up</a>
         <a href="{{ urls['generate_passcode'] }}">Get Passcodes</a>
     </header>
-    <p>Hi checkout the <a href="https://github.com/simonseo/no-mfa-please#how-it-works--usage">how-to</a> and the <a href="https://github.com/simonseo/no-mfa-please#faq" target="_blank" rel="noopener noreferrer">FAQ</a></p>
+    <p>
+        Here are your passcodes
+        <!-- {{ render_flash_hotp() }} -->
+        <ul>
+            {% for hotp in hotp_list %}
+                <li>{{ hotp }}</li>
+            {% endfor %}
+        </ul>
+    </p>
 </body>
 </html>

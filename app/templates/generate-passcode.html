@@ -3,19 +3,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta http-equiv="X-UA-Compatible" content="IE=Edge">
-	<meta charset="UTF-8">
-	<title>{{ title }}</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <meta charset="UTF-8">
+  <title>{{ title }}</title>
 </head>
 <body>
-<h1>{{ title }}</h1>
-<form method=POST>
-  <dl>
-    {{ render_field(form.email) }}
-    {{ render_field(form.password) }}
-    {{ render_field(form.count) }}
-  </dl>
-  <input type=submit value="Send me a passcode">
-</form>
+  <header>
+    <h1>{{ title }}</h1>
+    <a href="{{ urls['register_account'] }}">Sign up</a>
+    <a href="{{ urls['generate_passcode'] }}">Get Passcodes</a>
+  </header>
+  <form method=POST>
+    <dl>
+      {{ render_field(form.email) }}
+      {{ render_field(form.password) }}
+      {{ render_field(form.count) }}
+    </dl>
+    <input type=submit value="Show me passcodes">
+  </form>
 </body>
 </html>

@@ -3,22 +3,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta http-equiv="X-UA-Compatible" content="IE=Edge">
-	<meta charset="UTF-8">
-	<title>{{ title }}</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <meta charset="UTF-8">
+  <title>{{ title }}</title>
 </head>
 <body>
-<h1>{{ title }}</h1>
-<p>Follow the <a href="https://github.com/simonseo/no-mfa-please#how-it-works--usage">instructions</a> to register. Ask a local CS student for help. Note that it is impossible to recover or change your password on this site.</p>
-<form method=POST>
-  <dl>
-    {{ render_field(form.qr_url) }}
-    {{ render_field(form.email) }}
-    {{ render_field(form.password) }}
-    {{ render_field(form.confirm) }}
-    {{ render_field(form.accept_tos) }}
-  </dl>
-  <input type=submit value=Register>
-</form>
+  <header>
+    <h1>{{ title }}</h1>
+    <a href="{{ urls['register_account'] }}">Sign up</a>
+    <a href="{{ urls['generate_passcode'] }}">Get Passcodes</a>
+  </header>
+  <p>Follow the <a href="https://github.com/simonseo/no-mfa-please#how-it-works--usage">instructions</a> to register. Ask a local CS student for help. Note that it is impossible to recover or change your password on this site.</p>
+  <p>
+    <ol>
+      <li>Log in to <a href="https://start.nyu.edu" rel="nofollow">start.nyu.edu</a></li>
+      <li>Click 'NYU Multi-Factor Authentication Registration &amp; Update'</li>
+      <li>Click 'Add a New Device' in MFA panel</li>
+      <li>Log in with MFA</li>
+      <li>Add a 'Tablet (iPad, Nexus 7, etc.)' (Doesn't matter whether you choose iOS or Android)</li>
+      <li>Click 'I have Duo Mobile installed'. A QR code will show up.</li>
+      <li>Copy the image address (usually in the right click context menu or long press menu</li>
+    </ol>
+  </p>
+  <form method=POST>
+    <dl>
+      {{ render_field(form.qr_url) }}
+      {{ render_field(form.email) }}
+      {{ render_field(form.password) }}
+      {{ render_field(form.confirm) }}
+      {{ render_field(form.accept_tos) }}
+    </dl>
+    <input type=submit value=Register>
+  </form>
 </body>
 </html>

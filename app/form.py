@@ -22,7 +22,7 @@ class RegistrationForm(Form):
             validators.EqualTo('confirm', message='Passwords must match')
         ])
     confirm = PasswordField('Repeat Password', [validators.DataRequired()])
-    accept_tos = BooleanField('I accept the Terms of Service', [validators.DataRequired()])
+    accept_tos = BooleanField('I accept the <a href="tos">Terms of Service</a>', [validators.DataRequired()])
 
 
 class PasscodeRequestForm(Form):
