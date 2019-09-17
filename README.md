@@ -13,10 +13,10 @@ NYU incorporated Duo MFA into all of their websites: their administrative websit
 This is a welcome news for people who wish to secure their accounts, however, it is a shame that NYU forcefully implemented MFA on all of its users. MFA certainly is secure and apart from physical hacking (stealing the phone and looking over the shoulder), efforts to hack MFA have been futile. However, there are times when we wish we didn't have MFA (losing the phone or when its battery is dead). As a backup, this website will become your extra passcode generating token.
 
 ### How it works / Usage
-The user can designate the app as a "token" that can generates passcodes. This app lets users replace the condition above -- what they have, a phone -- with what they know, another email address and two more passwords.
+Users can designate this website as a "token" that can generates passcodes. This website lets users replace the security condition -- what they have, a phone -- with what they know, another email address and a password.
 
 
-1. get QR URL
+- Get QR URL
   1. Log in to [start.nyu.edu](https://start.nyu.edu) 
   1. Click 'NYU Multi-Factor Authentication Registration & Update'
   1. Click 'Add a New Device' in MFA panel
@@ -24,15 +24,17 @@ The user can designate the app as a "token" that can generates passcodes. This a
   1. Add a 'Tablet (iPad, Nexus 7, etc.)', doesn't matter whether you choose iOS or Android
   1. Click 'I have Duo Mobile installed'. A QR code will show up.
   1. Copy the image address (usually in the right click context menu or long press menu
-1. register (`\register`) using the QR URL, a non-nyu email, and password different from the nyu email and the non-nyu email
-1. send new passcode to registered email (`\passcode`)
+- Register (`\register`) using the QR URL, a non-nyu email, and a password
+- Send new passcodes to your registered email (`\passcode`)
 
 ### The Risks & why this app is still pretty secure
-The chance of your account getting hacked is higher using this app compared to using MFA without this app, since it provides another way for you (and a hacker) to access your account.
+The chance of your account getting hacked is higher using this website compared to using MFA without this app, since it provides another way for you (and hackers) to access your account.
 
-Level of security:
+Level of security (increasing order):
 
-Only username & password < MFA + this app < MFA without this app
+1. Using only username & password
+1. MFA + this app
+1. MFA without this app
 
 However, this app is still pretty secure because:
 - We send a passcode to your email instead of giving it to you right away: it is more convenient if you want to genereate and save multiple passcodes at once and also this adds another layer of security: in case somehone holds the account information for this app, they still need to know the password for your email.
