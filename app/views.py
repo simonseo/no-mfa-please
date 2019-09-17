@@ -41,8 +41,11 @@ def register_account():
             # hotp_secret = duo.activate(form.qr_url.data)
             hotp_secret = 'a85adc3516351791c05ef40bde772c24'
             db.insert_user(form.email.data, password, hotp_secret)
+        except UniqueViolationException as e:
+            flash("An account with that email already exists. Try another one.")
+            return redirect(url_for('register_account'))
         except Exception as e:
-            flash("I\'m sorry. Try again later. Let the adminstrator know about the error: {}".format(e))
+            flash("I\'m sorry. Try again later. Let the adminstrator know about the error: {} {}".format(type(e), e))
             return redirect(url_for('register_account'))
         else:
             flash("Thanks for registering. Received {} {}:{}".format(form.email.data, form.password.data, password))
@@ -57,7 +60,7 @@ def generate_passcode():
         try:
             user = db.get_user(form.email.data)
             if user is not None:
-            uid, email, password, hotp_secret, counter = user
+                uid, email, password, hotp_secret, counter = user
             else:
                 raise UserDataNotFoundException("Password does not match the one in the DB.")
             if not pwd_context.verify(form.password.data, password):
@@ -67,7 +70,7 @@ def generate_passcode():
         except Exception as e:
             app.logger.debug("Exception in generate_passcode: {}".format(e))
             flash("I\'m sorry. Try again later. Let the adminstrator know about the error: {}".format(e))
-            else:
+        else:
             app.logger.debug("Password verified, hotp_secret:{}".format(hotp_secret))
             # TODO update user here
             # TODO get duo to generate hotps
@@ -75,7 +78,7 @@ def generate_passcode():
             flash('We\'ll send an email to {0} with your new passcode! Received {0} {1} {2} {3} {4}'.format(form.email.data, form.password.data, form.count.data, hotp_secret, hotp_list))
         return redirect(url_for('generate_passcode'))
     else:
-    return render_template('generate-passcode.html', title='Generate Passcode', form=form)
+        return render_template('generate-passcode.html', title='Generate Passcode', form=form)
 
 
 '''
