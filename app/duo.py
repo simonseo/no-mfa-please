@@ -52,42 +52,19 @@ def encode(hotp_secret):
 	encoded_secret = base64.b32encode(hotp_secret.encode("utf-8"))
 	return encoded_secret
 
-def save_secret(hotp_secret, count):
-	'''Save updated info to DB
-	hotp_secret should look like "7e1c0372fec015ac976765ef4bb5c3f3" 
-	count should be an int'''
-	secrets = {
-		"hotp_secret" : hotp_secret,
-		"count" : count
-	}
-	with open(SECRETFILE, "w") as f:
-		json.dump(secrets, f)
-
-def load_secret():
-	'''loads datarow from DB'''
-	try:
-		with open(SECRETFILE, "r") as f:
-			secret_dict = json.load(f)
-	except Exception as e:
-		raise e
-	return secret_dict
-
-
-def HOTP(hotp_secret, count=0):
-	'''Usage: generate = HOTP(); passcode = generate()'''
+def generate_hotp(hotp_secret, current_at=0, n=1):
+	'''Generate `n` number of HOTPs starting at the `current_at` count
+	using `hotp_secret` that looks like `7e1c0372fec015ac976765ef4bb5c3f3`'''
 	#--- Create HOTP object
 	encoded_secret = encode(hotp_secret)
-	HOTP.hotp = pyotp.HOTP(encoded_secret)   # As long as the secret key is the same, the HOTP object is the same
-	HOTP.count = count
+	hotp = pyotp.HOTP(encoded_secret)   # As long as the secret key is the same, the HOTP object is the same
 
 	#--- Generate new passcode
-	def generate(n=1):
-		passcode_list = []
-		for i in range(n):
-			passcode = HOTP.hotp.at(HOTP.count + i)
-			passcode_list.append(passcode)
-		return passcode_list
-	return generate
+	passcode_list = []
+	for i in range(n):
+		passcode = hotp.at(current_at + i)
+		passcode_list.append(passcode)
+	return passcode_list
 
 
 

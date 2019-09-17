@@ -19,6 +19,7 @@ from app import app
 from app.form import RegistrationForm, PasscodeRequestForm
 from app import db
 from app import duo
+from .exceptions import AuthenticationException, WrongPasswordException, UserDataNotFoundException, UniqueViolationException
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -57,21 +58,25 @@ def generate_passcode():
         # checking account info should ideally happen in form.validate
         try:
             user = db.get_user(form.email.data)
+            if user is not None:
             uid, email, password, hotp_secret, counter = user
-            if not pwd_context.verify(form.password.data, password):
-                logger.debug("Password verification failed.")
-                raise Exception("Password does not match the one in the DB.")
             else:
-                logger.debug("Password verified, hotp_secret:{}".format(hotp_secret))
-                # update user here
-
-        except Exception as e:
-            logger.debug("Exception in generate_passcode: {}".format(e))
+                raise UserDataNotFoundException("Password does not match the one in the DB.")
+            if not pwd_context.verify(form.password.data, password):
+                raise WrongPasswordException("Password does not match the one in the DB.")
+        except AuthenticationException as e:
             flash("We\'re sorry. There is no user with the given credentials. Check your email and password.")
-            return redirect(url_for('generate_passcode'))
-        
-        flash('We\'ll send an email to {0} with your new passcode! Received {0} {1} {2} {3}'.format(form.email.data, form.password.data, form.count.data, hotp_secret))
+        except Exception as e:
+            app.logger.debug("Exception in generate_passcode: {}".format(e))
+            flash("I\'m sorry. Try again later. Let the adminstrator know about the error: {}".format(e))
+            else:
+            app.logger.debug("Password verified, hotp_secret:{}".format(hotp_secret))
+            # TODO update user here
+            # TODO get duo to generate hotps
+            hotp_list = duo.generate_hotp(hotp_secret, current_at=0, n=int(form.count.data))
+            flash('We\'ll send an email to {0} with your new passcode! Received {0} {1} {2} {3} {4}'.format(form.email.data, form.password.data, form.count.data, hotp_secret, hotp_list))
         return redirect(url_for('generate_passcode'))
+    else:
     return render_template('generate-passcode.html', title='Generate Passcode', form=form)
 
 
